@@ -12,4 +12,5 @@ set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "" FORCE)
 endif()
 
 add_subdirectory(app)
+add_subdirectory(app_direct)
 add_subdirectory(libs/emlib)
