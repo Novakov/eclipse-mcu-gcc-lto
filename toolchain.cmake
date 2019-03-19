@@ -1,0 +1,46 @@
+option(ENABLE_LTO "Enable LTO" ON)
+
+SET(CMAKE_SYSTEM_NAME Generic)
+SET(CMAKE_CROSSCOMPILING 1)
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+set(CMAKE_SYSTEM_PROCESSOR armv6)
+
+find_program(CMAKE_C_COMPILER NAMES arm-none-eabi-gcc PATHS ${TOOLCHAIN})
+find_program(CMAKE_CXX_COMPILER NAMES arm-none-eabi-g++ PATHS ${TOOLCHAIN})
+find_program(CMAKE_CXX_FILT NAMES arm-none-eabi-c++filt PATHS ${TOOLCHAIN})
+find_program(CMAKE_AR NAMES arm-none-eabi-gcc-ar PATHS ${TOOLCHAIN})
+find_program(CMAKE_RANLIB NAMES arm-none-eabi-gcc-ranlib PATHS ${TOOLCHAIN})
+find_program(CMAKE_OBJCOPY NAMES arm-none-eabi-objcopy PATHS C:/tools/pack/bin)
+find_program(CMAKE_OBJDUMP NAMES arm-none-eabi-objdump PATHS ${TOOLCHAIN})
+find_program(CMAKE_GCC_SIZE NAMES arm-none-eabi-size PATHS ${TOOLCHAIN})
+
+set(CMAKE_EXECUTABLE_FORMAT ELF)
+
+set(COMPILER_FLAGS "-mcpu=cortex-m3 -mthumb -ffunction-sections -fdata-sections -ggdb")
+
+set(COMPILER_FLAGS_DEBUG "-Og")
+set(COMPILER_FLAGS_RELEASE "-O2")
+
+if(ENABLE_LTO)
+    set(COMPILER_FLAGS_RELEASE "${COMPILER_FLAGS_RELEASE} -flto")
+endif()
+
+set(CMAKE_CXX_STANDARD 17)
+
+set(CMAKE_ASM_FLAGS "${COMPILER_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMPILER_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILER_FLAGS} -std=c++17 -fno-exceptions -fno-rtti")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-gc-sections -specs=nano.specs -specs=nosys.specs -Wl,-cref")
+if(ENABLE_LTO)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto")
+endif()
+
+
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${COMPILER_FLAGS_DEBUG}")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${COMPILER_FLAGS_DEBUG}")
+
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${COMPILER_FLAGS_RELEASE}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${COMPILER_FLAGS_RELEASE}")
+
+
+add_definitions(-DEFM32GG280F1024)
